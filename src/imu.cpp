@@ -50,7 +50,7 @@ bool imu_init()
     return true;
 }
 
-void imu_cal_gyro(FltData_t* fltdata)
+void imu_cal_gyro(FltData_t *fltdata)
 {
     const int smps = 500;
 
@@ -104,16 +104,15 @@ void imu_calc_initial_att(FltData_t *fltdata)
     float gy = ay * norm;
     float gz = az * norm;
 
-    // 2. We expect gravity to push purely on the X axis when perfectly vertical
-    // Target UP vector = (1, 0, 0)
-    // The quaternion representing the rotation from Target to Measured is:
-    // q.w = 1 + dot_product(Target, Measured)
-    // q.xyz = cross_product(Target, Measured)
+    // 2. Rotate the Measured Gravity vector TO the Target UP vector (1, 0, 0).
+    // This generates the correct Body-to-World quaternion.
+    // q.w = 1 + dot_product(Measured, Target)
+    // q.xyz = cross_product(Measured, Target)
 
     fltdata->quat[0] = 1.0f + gx; // w
-    fltdata->quat[1] = 0.0f;      // x (cross product of X-axis with itself is 0)
-    fltdata->quat[2] = -gz;       // y
-    fltdata->quat[3] = gy;        // z
+    fltdata->quat[1] = 0.0f;      // x (gy*0 - gz*0)
+    fltdata->quat[2] = gz;        // y (gz*1 - gx*0)
+    fltdata->quat[3] = -gy;       // z (gx*0 - gy*1)
 
     // 3. Normalize the resulting quaternion
     float q_norm = 1.0f / sqrtf(
@@ -127,8 +126,7 @@ void imu_calc_initial_att(FltData_t *fltdata)
     fltdata->quat[2] *= q_norm;
     fltdata->quat[3] *= q_norm;
 
-    // You can still call quat2euler here IF you want to log pitch/roll to SD card,
-    // but the control loop will no longer need them!
+    // Output Euler
     quat2euler(fltdata);
 }
 
