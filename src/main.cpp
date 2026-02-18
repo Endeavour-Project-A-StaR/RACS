@@ -71,7 +71,7 @@ void loop()
           if (c == 'A')
           {
             state = STATE_NAVLK;
-            Serial.println("------ NAV LOCK COMPLETE ------");
+            Serial.println("------ GUIDANCE IS INTERNAL ------");
           }
         }
         break;
