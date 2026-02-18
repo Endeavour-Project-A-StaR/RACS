@@ -3,11 +3,13 @@
 #include "types.h"
 #include "imu.h"
 
+FltStates_t state = STATE_DIAG;  // Default startup to self test
+FltData_t fltdata;  // Init shared flight data struct
 
 void setup() {
-  // put your setup code here, to run once:
+
+
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 }

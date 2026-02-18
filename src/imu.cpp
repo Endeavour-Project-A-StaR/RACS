@@ -1,5 +1,7 @@
 #include "imu.h"
 #include <math.h>
+#include <Wire.h>
+
 
 bool imu_init() 
 {
