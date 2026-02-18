@@ -100,25 +100,38 @@ void imu_calc_initial_att(FltData_t *fltdata)
     float ay = fltdata->accel[1];
     float az = fltdata->accel[2];
 
-    float roll = 0.0f;
-    float pitch = atan2f(-az, ax); // Deviation of X axis towards Z axis
-    float yaw = atan2f(ay, ax);    // Deviation of X axis towards Y axis
+    // 1. Normalize the measured gravity vector
+    float norm = 1.0f / sqrtf(ax * ax + ay * ay + az * az);
+    float gx = ax * norm;
+    float gy = ay * norm;
+    float gz = az * norm;
 
-    float cy = cosf(yaw * 0.5f);
-    float sy = sinf(yaw * 0.5f);
-    float cp = cosf(pitch * 0.5f);
-    float sp = sinf(pitch * 0.5f);
-    float cr = cosf(roll * 0.5f);
-    float sr = sinf(roll * 0.5f);
+    // 2. We expect gravity to push purely on the X axis when perfectly vertical
+    // Target UP vector = (1, 0, 0)
+    // The quaternion representing the rotation from Target to Measured is:
+    // q.w = 1 + dot_product(Target, Measured)
+    // q.xyz = cross_product(Target, Measured)
 
-    fltdata->quat[0] = cr * cp * cy + sr * sp * sy;
-    fltdata->quat[1] = sr * cp * cy - cr * sp * sy;
-    fltdata->quat[2] = cr * sp * cy + sr * cp * sy;
-    fltdata->quat[3] = cr * cp * sy - sr * sp * cy;
+    fltdata->quat[0] = 1.0f + gx; // w
+    fltdata->quat[1] = 0.0f;      // x (cross product of X-axis with itself is 0)
+    fltdata->quat[2] = -gz;       // y
+    fltdata->quat[3] = gy;        // z
 
-    fltdata->pitch = pitch;
-    fltdata->roll = roll;
-    fltdata->yaw = yaw;
+    // 3. Normalize the resulting quaternion
+    float q_norm = 1.0f / sqrtf(
+                              fltdata->quat[0] * fltdata->quat[0] +
+                              fltdata->quat[1] * fltdata->quat[1] +
+                              fltdata->quat[2] * fltdata->quat[2] +
+                              fltdata->quat[3] * fltdata->quat[3]);
+
+    fltdata->quat[0] *= q_norm;
+    fltdata->quat[1] *= q_norm;
+    fltdata->quat[2] *= q_norm;
+    fltdata->quat[3] *= q_norm;
+
+    // You can still call quat2euler here IF you want to log pitch/roll to SD card,
+    // but the control loop will no longer need them!
+    quat2euler(fltdata);
 }
 
 void imu_calc_att(FltData_t *fltdata, float dt)
