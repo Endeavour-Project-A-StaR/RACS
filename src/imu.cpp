@@ -15,6 +15,8 @@ static const float GYRO_SCALE = (float)GYRO_FSR_DPS / 32768.0f * DEG_2_RAD;
 
 static ICM456xx IMU(Wire, 0);
 
+static float gyro_bias[3] = {0.0f, 0.0f, 0.0f};
+
 static void quat2euler(FltData_t *fltdata)
 {
     float qw = fltdata->quat[0];
@@ -50,6 +52,29 @@ bool imu_init()
     return true;
 }
 
+void imu_cal_gyro()
+{
+    const int smps = 500;
+
+    float s_x = 0;
+    float s_y = 0;
+    float s_z = 0;
+
+    inv_imu_sensor_data_t imu_data;
+
+    for (int i = 0; i < smps; i++)
+    {
+        IMU.getDataFromRegisters(imu_data);
+        s_x += (float)imu_data.gyro_data[0] * GYRO_SCALE;
+        s_y += (float)imu_data.gyro_data[1] * GYRO_SCALE;
+        s_z += (float)imu_data.gyro_data[2] * GYRO_SCALE;
+        delay(1);
+    }
+    gyro_bias[0] = s_x / smps;
+    gyro_bias[1] = s_y / smps;
+    gyro_bias[2] = s_z / smps;
+}
+
 bool imu_read(FltData_t *fltdata)
 {
     inv_imu_sensor_data_t imu_data;
@@ -62,9 +87,9 @@ bool imu_read(FltData_t *fltdata)
     fltdata->accel[1] = (float)imu_data.accel_data[1] * ACCEL_SCALE;
     fltdata->accel[2] = (float)imu_data.accel_data[2] * ACCEL_SCALE;
 
-    fltdata->gyro[0] = (float)imu_data.gyro_data[0] * GYRO_SCALE;
-    fltdata->gyro[1] = (float)imu_data.gyro_data[1] * GYRO_SCALE;
-    fltdata->gyro[2] = (float)imu_data.gyro_data[2] * GYRO_SCALE;
+    fltdata->gyro[0] = ((float)imu_data.gyro_data[0] * GYRO_SCALE) - gyro_bias[0];
+    fltdata->gyro[1] = ((float)imu_data.gyro_data[1] * GYRO_SCALE) - gyro_bias[1];
+    fltdata->gyro[2] = ((float)imu_data.gyro_data[2] * GYRO_SCALE) - gyro_bias[2];
 
     return true;
 }
@@ -76,8 +101,8 @@ void imu_calc_initial_att(FltData_t *fltdata)
     float az = fltdata->accel[2];
 
     float roll = 0.0f;
-    float pitch = atan2f(ax, sqrtf(ay * ay + az * az));
-    float yaw = atan2f(ay, az);
+    float pitch = atan2f(-az, ax); // Deviation of X axis towards Z axis
+    float yaw = atan2f(ay, ax);    // Deviation of X axis towards Y axis
 
     float cy = cosf(yaw * 0.5f);
     float sy = sinf(yaw * 0.5f);
@@ -103,9 +128,9 @@ void imu_calc_att(FltData_t *fltdata, float dt)
 
     // Rate of change of quaternion from Gyro
     float qDot1 = 0.5f * (-q1 * gx - q2 * gy - q3 * gz);
-    float qDot2 = 0.5f * ( q0 * gx + q2 * gz - q3 * gy);
-    float qDot3 = 0.5f * ( q0 * gy - q1 * gz + q3 * gx);
-    float qDot4 = 0.5f * ( q0 * gz + q1 * gy - q2 * gx);
+    float qDot2 = 0.5f * (q0 * gx + q2 * gz - q3 * gy);
+    float qDot3 = 0.5f * (q0 * gy - q1 * gz + q3 * gx);
+    float qDot4 = 0.5f * (q0 * gz + q1 * gy - q2 * gx);
 
     // Integrate
     q0 += qDot1 * dt;
