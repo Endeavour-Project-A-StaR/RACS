@@ -117,6 +117,9 @@ void loop()
 
         imu_calc_att(&fltdata, dt);
         break;
+
+      default:
+        break;
       }
     }
     else
