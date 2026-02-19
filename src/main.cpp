@@ -41,7 +41,7 @@ void print_telem()
 
     int len = serializer(ser_buf, sizeof(ser_buf), millis(), state, &fltdata);
 
-    if (len > 0 && len < sizeof(ser_buf))
+    if (len > 0 && (size_t)len < sizeof(ser_buf))
       Serial.println(ser_buf);
   }
 }

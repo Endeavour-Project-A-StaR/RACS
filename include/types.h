@@ -26,9 +26,8 @@ typedef struct
     // Computed altitude
     float altitude;
 
-    // Orientation data
+    // Quats
     float quat[4]; // w, x, y, z
-    float pitch, yaw, roll;
 
     // Control outputs
     float servo_out[4];

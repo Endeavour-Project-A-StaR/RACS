@@ -15,24 +15,6 @@ static const float GYRO_SCALE = (float)GYRO_FSR_DPS / 32768.0f * DEG_2_RAD;
 
 static ICM456xx IMU(Wire, 0);
 
-static void quat2euler(FltData_t *fltdata)
-{
-    float qw = fltdata->quat[0];
-    float qx = fltdata->quat[1];
-    float qy = fltdata->quat[2];
-    float qz = fltdata->quat[3];
-
-    fltdata->roll = atan2f(2.0f * (qw * qx + qy * qz), 1.0f - 2.0f * (qx * qx + qy * qy));
-
-    float sinp = 2.0f * (qw * qy - qz * qx);
-    if (abs(sinp) >= 1)
-        fltdata->pitch = copysign(M_PI / 2, sinp);
-    else
-        fltdata->pitch = asinf(sinp);
-
-    fltdata->yaw = atan2f(2.0f * (qw * qz + qx * qy), 1.0f - 2.0f * (qy * qy + qz * qz));
-}
-
 bool imu_init()
 {
     int ret = IMU.begin();
@@ -125,9 +107,6 @@ void imu_calc_initial_att(FltData_t *fltdata)
     fltdata->quat[1] *= q_norm;
     fltdata->quat[2] *= q_norm;
     fltdata->quat[3] *= q_norm;
-
-    // Output Euler
-    quat2euler(fltdata);
 }
 
 void imu_calc_att(FltData_t *fltdata, float dt)
@@ -153,7 +132,4 @@ void imu_calc_att(FltData_t *fltdata, float dt)
     fltdata->quat[1] = q1 * recipNorm;
     fltdata->quat[2] = q2 * recipNorm;
     fltdata->quat[3] = q3 * recipNorm;
-
-    // Output Euler
-    quat2euler(fltdata);
 }
