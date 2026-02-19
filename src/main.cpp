@@ -16,6 +16,9 @@ uint32_t last_loop_time = 0;
 void setup()
 {
 
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+
   Serial.begin(0); // ACM doesnt need baud rate
 
   Wire.begin();
@@ -49,6 +52,8 @@ void setup()
   nav_rst_integral();
 
   state = STATE_PREFLT;
+
+  digitalWrite(LED_BUILTIN, HIGH);
 
   last_loop_time = micros();
 }

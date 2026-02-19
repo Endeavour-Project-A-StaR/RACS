@@ -187,6 +187,11 @@ static void cmd_processor(char *cmd_str, FltStates_t *state)
         Serial.println("MSG: EEPROM RESET TO DEFAULTS");
     }
 
+    else if (strcmp(cmd, "MAGICRESET") == 0)
+    {
+        SCB_AIRCR = 0x05FA0004;
+    }
+
     else
     {
         Serial.println("MSG: UNKNOWN COMMAND");
