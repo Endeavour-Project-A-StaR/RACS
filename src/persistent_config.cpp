@@ -22,6 +22,7 @@ void config_set_defaults()
     config.log_interval_ms = 50;
     config.log_flush_interval_ms = 200;
 
+    config.en_servo_in_burn = false;
     config.test_mode_en = false;
 }
 
@@ -31,11 +32,11 @@ void config_init()
 
     if (config.magic == CFG_MAGIC)
     {
-        Serial.println("CONFIG LOADED FROM EEPROM");
+        Serial.println("MSG: CONFIG LOADED FROM EEPROM");
     }
     else
     {
-        Serial.println("EEPROM INVALID, RESTORING TO DEFAULT");
+        Serial.println("MSG: EEPROM INVALID, RESTORING TO DEFAULT");
         config_set_defaults();
         config_save();
     }
@@ -44,5 +45,5 @@ void config_init()
 void config_save()
 {
     EEPROM.put(0, config);
-    Serial.println("CONFIG WRITTEN TO EEPROM");
+    Serial.println("MSG: EEPROM WRITE SUCCESS");
 }

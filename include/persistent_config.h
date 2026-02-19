@@ -6,12 +6,13 @@
 
 // MUST be incremented when config struct is changed
 // Epoch 1 0xDEAD0001 FEB-19-2026
-#define CFG_MAGIC 0xDEAD0001
+// Epoch 2 0xDEAD0002 FEB-19-2026 Added switch to disable servo during burn
+#define CFG_MAGIC 0xDEAD0002
 
 typedef struct
 {
     uint32_t magic;
-    
+
     PIDCoeff_t pid_pitch;
     PIDCoeff_t pid_roll;
     PIDCoeff_t pid_yaw;
@@ -25,7 +26,10 @@ typedef struct
     uint32_t parachute_charge_timeout_ms;
     uint32_t log_interval_ms;
     uint32_t log_flush_interval_ms;
+
+    bool en_servo_in_burn;
     bool test_mode_en;
+
 } PersistentCfg_t;
 
 extern PersistentCfg_t config;
