@@ -130,13 +130,18 @@ static void cmd_processor(char *cmd_str, FltStates_t *state)
             Serial.printf("MSG: SERVO_LIMIT %.1f\n", config.servo_limit_max_deg);
         }
 
+        else if (strcmp(arg1, "MOTOR_BURN_MS") == 0)
+        {
+            config.motor_burn_time_ms = (uint32_t)val;
+            Serial.printf("MSG: MOTOR_BURN_MS %lu\n", config.motor_burn_time_ms);
+        }
+
         else if (strcmp(arg1, "CHUTE_TIMEOUT_MS") == 0)
         {
             config.parachute_charge_timeout_ms = (uint32_t)val;
             Serial.printf("MSG: CHUTE_TIMEOUT_MS %lu\n", config.parachute_charge_timeout_ms);
         }
 
-        // Telemetry Rate
         else if (strcmp(arg1, "TELEM_RATE") == 0)
         {
             config.log_interval_ms = (uint32_t)val;
@@ -186,7 +191,9 @@ static void cmd_processor(char *cmd_str, FltStates_t *state)
         Serial.printf("CFG: SERVO_LIMIT %.1f\n", config.servo_limit_max_deg);
         Serial.printf("CFG: SERVO_US_PER_DEG %.1f\n", config.servo_us_per_deg);
 
+        Serial.printf("CFG: MOTOR_BURN_MS %lu\n", config.motor_burn_time_ms);
         Serial.printf("CFG: CHUTE_TIMEOUT_MS %lu\n", config.parachute_charge_timeout_ms);
+
         Serial.printf("CFG: TELEM_RATE %lu\n", config.log_interval_ms);
         Serial.printf("CFG: FLUSH_RATE %lu\n", config.log_flush_interval_ms);
         Serial.printf("CFG: TEST_MODE_EN %d\n", config.test_mode_en);

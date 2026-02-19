@@ -17,6 +17,7 @@ void config_set_defaults()
     config.servo_us_per_deg = 10.0f;
     config.servo_limit_max_deg = 30.0f;
 
+    config.motor_burn_time_ms = 3000;
     config.parachute_charge_timeout_ms = 60000;
 
     config.log_interval_ms = 50;

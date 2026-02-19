@@ -27,6 +27,8 @@ void setup()
   while (!Serial.available())
     delay(1);
 
+  Serial.println("RACS Development Booting Up");
+
   config_init();
 
   int ret = imu_init();

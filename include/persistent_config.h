@@ -7,7 +7,8 @@
 // MUST be incremented when config struct is changed
 // Epoch 1 0xDEAD0001 FEB-19-2026
 // Epoch 2 0xDEAD0002 FEB-19-2026 Added switch to disable servo during burn
-#define CFG_MAGIC 0xDEAD0002
+// Epoch 3 0xDEAD0003 FEB-19-2026 Added motor burn time
+#define CFG_MAGIC 0xDEAD0003
 
 typedef struct
 {
@@ -23,7 +24,9 @@ typedef struct
     float servo_limit_max_deg;
     float servo_us_per_deg;
 
+    uint32_t motor_burn_time_ms;
     uint32_t parachute_charge_timeout_ms;
+
     uint32_t log_interval_ms;
     uint32_t log_flush_interval_ms;
 
