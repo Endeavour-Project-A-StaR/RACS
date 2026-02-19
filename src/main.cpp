@@ -1,9 +1,20 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include <PWMServo.h>
 #include "types.h"
 #include "imu.h"
 #include "nav.h"
 #include "log.h"
+
+#define PIN_SERVO_1 37
+#define PIN_SERVO_2 14
+#define PIN_SERVO_3 36
+#define PIN_SERVO_4 33
+
+static PWMServo servo_1;
+static PWMServo servo_2;
+static PWMServo servo_3;
+static PWMServo servo_4;
 
 FltStates_t state = STATE_DIAG; // Default startup to self test
 FltData_t fltdata;              // Init shared flight data struct
@@ -67,6 +78,42 @@ void command_parser()
   }
 }
 
+void servo_swing_test()
+{
+  for (int pos = 90; pos <= 135; pos++)
+  {
+    servo_1.write(pos);
+    servo_2.write(pos);
+    servo_3.write(pos);
+    servo_4.write(pos);
+    delay(20);
+  }
+  for (int pos = 135; pos >= 45; pos--)
+  {
+    servo_1.write(pos);
+    servo_2.write(pos);
+    servo_3.write(pos);
+    servo_4.write(pos);
+    delay(20);
+  }
+  for (int pos = 45; pos <= 90; pos++)
+  {
+    servo_1.write(pos);
+    servo_2.write(pos);
+    servo_3.write(pos);
+    servo_4.write(pos);
+    delay(20);
+  }
+}
+
+void servos_write(FltData_t *fltdata)
+{
+  servo_1.write((int)fltdata->servo_out[0]);
+  servo_2.write((int)fltdata->servo_out[1]);
+  servo_3.write((int)fltdata->servo_out[2]);
+  servo_4.write((int)fltdata->servo_out[3]);
+}
+
 void setup()
 {
 
@@ -80,8 +127,6 @@ void setup()
 
   Serial.println("------ Bayes V3_5 Test ------");
 
-  delay(500);
-
   Serial.println("Will init IMU");
 
   int ret = imu_init();
@@ -90,18 +135,30 @@ void setup()
     while (1)
       delay(1);
 
-  delay(500);
+  Serial.println("Will init servos");
+  servo_1.attach(PIN_SERVO_1);
+  servo_2.attach(PIN_SERVO_2);
+  servo_3.attach(PIN_SERVO_3);
+  servo_4.attach(PIN_SERVO_4);
+  Serial.println("Will test servos");
+  servo_swing_test();
+  Serial.println("Servo recentered");
+
+  fltdata.servo_out[0] = 90.0f;
+  fltdata.servo_out[1] = 90.0f;
+  fltdata.servo_out[2] = 90.0f;
+  fltdata.servo_out[3] = 90.0f;
 
   Serial.println("Will calibrate gyro bias in 5 sec");
   delay(5000);
   imu_cal_gyro(&fltdata);
   Serial.println("Gyro calibration complete");
 
-  delay(500);
-
-  Serial.println("Bayes HW init complete. Will enter Preflight state");
+  Serial.println("Bayes HW init complete. Will enter Preflight state in 5 sec");
 
   Serial.println("\nCommands Available: A = NAV LOCK | O = GROUND OVERRIDE | P = REVERT TO PREFLIGHT");
+
+  delay(5000);
 
   nav_rst_integral();
 
@@ -181,6 +238,8 @@ void loop()
 
         break;
       }
+
+      servos_write(&fltdata);
 
       print_telem();
     }
