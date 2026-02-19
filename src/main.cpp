@@ -12,6 +12,7 @@ FltStates_t state = STATE_DIAG; // Default startup to self test
 FltData_t fltdata;              // Init shared flight data struct
 
 uint32_t last_loop_time = 0;
+uint32_t burn_start = 0;
 
 void setup()
 {
@@ -87,6 +88,7 @@ void loop()
         if (fltdata.accel[0] > 20.0f)
         {
           state = STATE_BURN;
+          burn_start = millis();
           Serial.println("MSG: LIFTOFF");
         }
         break;
@@ -94,12 +96,14 @@ void loop()
       case STATE_BURN:
 
         imu_calc_att(&fltdata, dt);
-        nav_update_pid(&fltdata, dt);
 
-        if (fltdata.accel[0] < 0.0f)
+        if (config.en_servo_in_burn)
+          nav_update_pid(&fltdata, dt);
+
+        if ((millis() - burn_start) >= config.motor_burn_time_ms)
         {
           state = STATE_COAST;
-          Serial.println("MSG: BURNOUT");
+          Serial.println("MSG: BURN TIMER EXPIRED, UNLOCKING FINS");
         }
 
         break;
