@@ -12,7 +12,7 @@ Flight computer software to hold rockets up right
 - [x] Add timer for burn to coast transistion
 - [x] Add timer to parachute deployment
 - [x] Move PID constants and tunables to EEPROM
-- [ ] Ground station software
+- [x] Ground station software
 - [x] Enable tuning from ground station SW?
 - [ ] Add watchdog?
 - [ ] Add filter for servo?
