@@ -11,8 +11,8 @@
 FltStates_t state = STATE_DIAG; // Default startup to self test
 FltData_t fltdata;              // Init shared flight data struct
 
-uint32_t last_loop_time = 0;
-uint32_t burn_start = 0;
+uint32_t last_loop_time;
+uint32_t burn_start;
 
 void setup()
 {
@@ -113,15 +113,16 @@ void loop()
         imu_calc_att(&fltdata, dt);
         nav_update_pid(&fltdata, dt);
 
-        if (false)
+        if ((millis() - burn_start) >= config.parachute_charge_timeout_ms)
         {
           state = STATE_RECVY;
-          Serial.println("MSG: APOGEE REACHED");
+          Serial.println("MSG: PARACHUTE DELAY CHARGE TIMER EXPIRED, DISABLING CONTROL");
         }
 
         break;
 
       case STATE_RECVY:
+        imu_calc_att(&fltdata, dt);
         break;
 
       case STATE_OVRD:
