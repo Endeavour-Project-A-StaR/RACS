@@ -195,7 +195,7 @@ static void cmd_processor(char *cmd_str, FltStates_t *state)
         Serial.printf("CFG: CHUTE_TIMEOUT_MS %lu\n", config.parachute_charge_timeout_ms);
 
         Serial.printf("CFG: TELEM_RATE %lu\n", config.log_interval_ms);
-        Serial.printf("CFG: FLUSH_RATE %lu\n", config.log_flush_interval_ms);
+        Serial.printf("CFG: TELEM_FLUSH_RATE %lu\n", config.log_flush_interval_ms);
         Serial.printf("CFG: TEST_MODE_EN %d\n", config.test_mode_en);
         Serial.printf("CFG: SERVO_BURN_EN %d\n", config.en_servo_in_burn);
     }

@@ -156,7 +156,7 @@ void loop()
       }
 
       static uint32_t last_log_time = 0;
-      if ((millis() - last_log_time) >= 10)
+      if ((millis() - last_log_time) >= config.log_interval_ms)
       {
         log_write_frame(&fltdata, state, millis());
         last_log_time = millis();

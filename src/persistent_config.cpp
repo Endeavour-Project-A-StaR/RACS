@@ -20,8 +20,8 @@ void config_set_defaults()
     config.motor_burn_time_ms = 3000;
     config.parachute_charge_timeout_ms = 60000;
 
-    config.log_interval_ms = 50;
-    config.log_flush_interval_ms = 200;
+    config.log_interval_ms = 10;
+    config.log_flush_interval_ms = 100;
 
     config.en_servo_in_burn = false;
     config.test_mode_en = false;

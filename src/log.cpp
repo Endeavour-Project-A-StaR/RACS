@@ -1,4 +1,5 @@
 #include "log.h"
+#include "persistent_config.h"
 #include <SdFat.h>
 
 static SdFs sd;
@@ -104,7 +105,7 @@ bool log_write_frame(FltData_t *fltdata, FltStates_t state, uint32_t timestamp)
 
         static uint32_t last_sync_time = 0;
 
-        if (timestamp - last_sync_time > 100)
+        if (timestamp - last_sync_time > config.log_flush_interval_ms)
         {
             logfile.sync();
             last_sync_time = timestamp;
