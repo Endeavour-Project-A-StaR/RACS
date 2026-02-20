@@ -33,6 +33,10 @@ void setup()
 
   config_init();
 
+  if (!log_init())
+    while (1)
+      delay(1);
+
   if (!imu_init())
     while (1)
       delay(1);
@@ -149,6 +153,13 @@ void loop()
       {
         baro_read(&fltdata);
         last_baro_read = current_time;
+      }
+
+      static uint32_t last_log_time = 0;
+      if ((millis() - last_log_time) >= 10)
+      {
+        log_write_frame(&fltdata, state, millis());
+        last_log_time = millis();
       }
 
       comms_send_telem(state, &fltdata);
