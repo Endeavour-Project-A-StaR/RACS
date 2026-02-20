@@ -5,7 +5,7 @@
 #include "nav.h"
 #include "log.h"
 #include "actuators.h"
-#include "persistent_config.h"
+#include "eeprom_config.h"
 #include "comms.h"
 #include "baro.h"
 

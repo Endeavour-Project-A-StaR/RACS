@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "log.h"
 #include "nav.h"
-#include "persistent_config.h"
+#include "eeprom_config.h"
 #include "comms.h"
 
 static uint32_t last_print_time = 0;
@@ -136,10 +136,10 @@ static void cmd_processor(char *cmd_str, FltStates_t *state)
             Serial.printf("MSG: MOTOR_BURN_MS %lu\n", config.motor_burn_time_ms);
         }
 
-        else if (strcmp(arg1, "CHUTE_TIMEOUT_MS") == 0)
+        else if (strcmp(arg1, "CHUTE_TIMEOUT_MS_FROM_IGN") == 0)
         {
             config.parachute_charge_timeout_ms = (uint32_t)val;
-            Serial.printf("MSG: CHUTE_TIMEOUT_MS %lu\n", config.parachute_charge_timeout_ms);
+            Serial.printf("MSG: CHUTE_TIMEOUT_MS_FROM_IGN %lu\n", config.parachute_charge_timeout_ms);
         }
 
         else if (strcmp(arg1, "TELEM_RATE") == 0)
@@ -192,7 +192,7 @@ static void cmd_processor(char *cmd_str, FltStates_t *state)
         Serial.printf("CFG: SERVO_US_PER_DEG %.1f\n", config.servo_us_per_deg);
 
         Serial.printf("CFG: MOTOR_BURN_MS %lu\n", config.motor_burn_time_ms);
-        Serial.printf("CFG: CHUTE_TIMEOUT_MS %lu\n", config.parachute_charge_timeout_ms);
+        Serial.printf("CFG: CHUTE_TIMEOUT_MS_FROM_IGN %lu\n", config.parachute_charge_timeout_ms);
 
         Serial.printf("CFG: TELEM_RATE %lu\n", config.log_interval_ms);
         Serial.printf("CFG: TELEM_FLUSH_RATE %lu\n", config.log_flush_interval_ms);

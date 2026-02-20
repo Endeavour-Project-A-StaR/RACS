@@ -1,5 +1,5 @@
 #include "nav.h"
-#include "persistent_config.h"
+#include "eeprom_config.h"
 #include <math.h>
 
 static const float SERVO_CENTER = 90.0f;

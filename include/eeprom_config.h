@@ -33,9 +33,9 @@ typedef struct
     bool en_servo_in_burn;
     bool test_mode_en;
 
-} PersistentCfg_t;
+} EEPROMCfg_t;
 
-extern PersistentCfg_t config;
+extern EEPROMCfg_t config;
 
 void config_init();
 void config_save();

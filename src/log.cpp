@@ -1,5 +1,5 @@
 #include "log.h"
-#include "persistent_config.h"
+#include "eeprom_config.h"
 #include <SdFat.h>
 
 static SdFs sd;

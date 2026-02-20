@@ -1,8 +1,8 @@
-#include "persistent_config.h"
+#include "eeprom_config.h"
 #include <EEPROM.h>
 #include <Arduino.h>
 
-PersistentCfg_t config;
+EEPROMCfg_t config;
 
 void config_set_defaults()
 {

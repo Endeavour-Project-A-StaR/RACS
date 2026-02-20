@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <Servo.h>
 #include "actuators.h"
-#include "persistent_config.h"
+#include "eeprom_config.h"
 
 /*
 Our servos uses non standard pulse widths (sad)
