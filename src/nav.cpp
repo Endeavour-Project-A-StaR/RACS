@@ -3,6 +3,7 @@
 #include <math.h>
 
 static const float SERVO_CENTER = 90.0f;
+static const float RAD_2_DEG = (180.0f / 3.14159265f);
 
 static float i_roll = 0.0f;
 static float i_pitch = 0.0f;
@@ -38,9 +39,13 @@ void nav_update_pid(FltData_t *fltdata, float dt)
     float err_yaw_rad = -fltdata->quat[3] * 2.0f;   // Rotation around Z
 
     // Convert to degrees so our PID tuning feels more human-readable
-    float err_roll = err_roll_rad * (180.0f / 3.14159265f);
-    float err_pitch = err_pitch_rad * (180.0f / 3.14159265f);
-    float err_yaw = err_yaw_rad * (180.0f / 3.14159265f);
+    float err_roll = err_roll_rad * RAD_2_DEG;
+    float err_pitch = err_pitch_rad * RAD_2_DEG;
+    float err_yaw = err_yaw_rad * RAD_2_DEG;
+
+    float rate_roll_deg = fltdata->gyro[0] * RAD_2_DEG;
+    float rate_pitch_deg = fltdata->gyro[1] * RAD_2_DEG;
+    float rate_yaw_deg = fltdata->gyro[2] * RAD_2_DEG;
 
     // 2. PID CALCULATIONS
 
@@ -52,17 +57,23 @@ void nav_update_pid(FltData_t *fltdata, float dt)
     // Roll PID
     i_roll += err_roll * dt;
     i_roll = constrain_f(i_roll, -config.pid_i_max, config.pid_i_max);
-    float out_roll = (config.pid_roll.kp * err_roll) + (config.pid_roll.ki * i_roll) - (config.pid_roll.kd * fltdata->gyro[0]);
+    float out_roll = (config.pid_roll.kp * err_roll) +
+                     (config.pid_roll.ki * i_roll) -
+                     (config.pid_roll.kd * rate_roll_deg);
 
     // Pitch PID
     i_pitch += err_pitch * dt;
     i_pitch = constrain_f(i_pitch, -config.pid_i_max, config.pid_i_max);
-    float out_pitch = (config.pid_pitch.kp * err_pitch) + (config.pid_pitch.ki * i_pitch) - (config.pid_pitch.kd * fltdata->gyro[1]);
+    float out_pitch = (config.pid_pitch.kp * err_pitch) + 
+                      (config.pid_pitch.ki * i_pitch) - 
+                      (config.pid_pitch.kd * rate_pitch_deg);
 
     // Yaw PID
     i_yaw += err_yaw * dt;
     i_yaw = constrain_f(i_yaw, -config.pid_i_max, config.pid_i_max);
-    float out_yaw = (config.pid_yaw.kp * err_yaw) + (config.pid_yaw.ki * i_yaw) - (config.pid_yaw.kd * fltdata->gyro[2]);
+    float out_yaw = (config.pid_yaw.kp * err_yaw) + 
+                    (config.pid_yaw.ki * i_yaw) - 
+                    (config.pid_yaw.kd * rate_yaw_deg);
 
     // 3. PLUS (+)-CONFIGURATION SERVO MIXER
     // Maps the 3 rotational requests into 4 physical servo movements.

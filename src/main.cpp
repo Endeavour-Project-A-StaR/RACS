@@ -21,6 +21,7 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 
+  Serial.begin(0);
   Serial1.begin(38400);
 
   Wire.begin();
@@ -55,8 +56,8 @@ void setup()
 
   Serial1.println("MSG: SERVO RECENTERED");
 
-  Serial1.println("MSG: GYRO CAL IN 5 SEC");
-  delay(5000);
+  Serial1.println("MSG: GYRO CAL IN 3 SEC");
+  delay(3000);
   imu_cal_gyro(&fltdata);
 
   Serial1.println("MSG: BAYES READY");
@@ -67,7 +68,8 @@ void setup()
 
   Serial1.println("MSG: The rocket knows where it is at all times.");
 
-  digitalWrite(LED_BUILTIN, HIGH);
+  if (config.test_mode_en == 0)
+    digitalWrite(LED_BUILTIN, HIGH);
 
   last_loop_time = micros();
 }

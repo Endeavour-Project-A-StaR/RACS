@@ -69,7 +69,10 @@ void comms_send_telem(FltStates_t state, FltData_t *fltdata)
         int len = serializer(ser_buf, sizeof(ser_buf), millis(), state, fltdata);
 
         if (len > 0 && (size_t)len < sizeof(ser_buf))
-            Serial.println(ser_buf);
+        {
+            if (Serial.availableForWrite() >= (len + 4))
+                Serial.println(ser_buf);
+        }
     }
 }
 

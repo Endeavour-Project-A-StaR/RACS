@@ -11,6 +11,7 @@ class GroundControlStation(QMainWindow):
         super().__init__()
         self.ser = None
         self.configs = {}
+        self.serial_buffer = ""
         
         self.setWindowTitle("RACS - Ground Control Station")
         self.resize(1100, 700) 
@@ -201,7 +202,7 @@ class GroundControlStation(QMainWindow):
         for p in ports:
             self.port_combo.addItem(p.device)
             # Check for Teensy VID (0x16C0) or typical Linux nomenclature
-            if (p.vid == 0x16C0) or ("ACM" in p.device) or ("USB" in p.description):
+            if ("rfcomm" in p.device):
                 if not best_port:
                     best_port = p.device
                     
@@ -335,12 +336,24 @@ class GroundControlStation(QMainWindow):
     def read_serial(self):
         if self.ser and self.ser.is_open:
             try:
-                while self.ser.in_waiting:
-                    line = self.ser.readline().decode('utf-8', errors='ignore').strip()
-                    self.process_line(line)
+                if self.ser.in_waiting:
+                    # 1. Read ALL currently available bytes from the Bluetooth receiver
+                    chunk = self.ser.read(self.ser.in_waiting).decode('utf-8', errors='ignore')
+                    
+                    # 2. Add them to our waiting room buffer
+                    self.serial_buffer += chunk
+
+                    # 3. Only process data if a full line (ending in newline) is present
+                    while '\n' in self.serial_buffer:
+                        # Split the buffer at the FIRST newline it finds
+                        line, self.serial_buffer = self.serial_buffer.split('\n', 1)
+                        
+                        # Process that complete line
+                        self.process_line(line.strip())
+
             except Exception as e:
                 self.log_msg(f"Serial Error: {str(e)}", "red")
-                self.toggle_connection() # This triggers disconnect and auto-refreshes the port list!
+                self.toggle_connection()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
